@@ -66,7 +66,7 @@ class SingleLinkedList[T](val head: Option[SingleLinkedNode[T]], val tail: Optio
   override def toString: String = {
     if (isEmpty) "()"
     if (head == tail) s"(${head.get.value})"
-    else ""
+    else "TODO"
   }
 }
 

@@ -6,6 +6,11 @@ case class SingleLinkedNode[T](value: T, next: Option[SingleLinkedNode[T]]) {
     else if (next.isEmpty) false
     else next.get.exists(fn)
   }
+
+  def fold[A](init: A)(fn: (A, SingleLinkedNode[T]) => A): A = {
+    if (next.isEmpty) fn(init, this)
+    else next.get.fold(fn(init, this))(fn)
+  }
 }
 
 trait LinkedList[T] {
@@ -32,7 +37,7 @@ class SingleLinkedList[T](val head: Option[SingleLinkedNode[T]], val tail: Optio
     new SingleLinkedList[T](newHead, newTail)
 
   def add(node: SingleLinkedNode[T]): SingleLinkedList[T] = {
-    copy(Some(node.copy(next = head)))
+    copy(Some(node.copy(next = head)), head)
   }
 
   def isEmpty: Boolean = head.isEmpty
@@ -45,7 +50,7 @@ class SingleLinkedList[T](val head: Option[SingleLinkedNode[T]], val tail: Optio
   def remove: SingleLinkedList[T] = {
     if (isEmpty) throw new ArrayStoreException("LinkedList is empty, nothing to remove")
     if (head == tail) new SingleLinkedList(None, None)
-    copy(newHead = head.get.next)
+    copy(newHead = head.get.next, tail)
   }
 
   def reverse: SingleLinkedList[T] = {
@@ -66,7 +71,13 @@ class SingleLinkedList[T](val head: Option[SingleLinkedNode[T]], val tail: Optio
   override def toString: String = {
     if (isEmpty) "()"
     if (head == tail) s"(${head.get.value})"
-    else "TODO"
+    else {
+      val strElems = head.get.fold("") { case (str, node) =>
+        if (node.next.isEmpty) node.value.toString
+        str ++ s"${node.value.toString}, "
+      }
+      s"(${strElems})"
+    }
   }
 }
 

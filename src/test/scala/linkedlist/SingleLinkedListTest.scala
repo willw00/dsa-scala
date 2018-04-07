@@ -47,15 +47,21 @@ class SingleLinkedListTest extends WordSpec with Matchers {
       moreList.map( _ + 1).toString shouldEqual "(6, 5, 4, 3, 2)"
     }
 
-//    "properly evaluate equality" in {
-//      (empty == empty) shouldEqual true
-//      (empty == aList) shouldEqual false
-//      (aList == aList) shouldEqual true
-//      (aList == moreList) shouldEqual false
-//      (moreList == moreList) shouldEqual true
-//      (moreList.reverse == moreList) shouldEqual false
-//      (empty.reverse == empty) shouldEqual true
-//      (aList.reverse == aList) shouldEqual true
-//    }
+    "properly zip two lists" in {
+      empty.zip(empty).toString shouldEqual "()"
+      aList.zip(aList).toString shouldEqual "((1,1))"
+      moreList.zip(moreList.reverse).toString shouldEqual "((5,1), (4,2), (3,3), (2,4), (1,5))"
+    }
+
+    "properly evaluate equality" in {
+      (empty == empty) shouldEqual true
+      (empty == aList) shouldEqual false
+      (aList == aList) shouldEqual true
+      (aList == moreList) shouldEqual false
+      (moreList == moreList) shouldEqual true
+      (moreList.reverse == moreList) shouldEqual false
+      (empty.reverse == empty) shouldEqual true
+      (aList.reverse == aList) shouldEqual true
+    }
   }
 }

@@ -108,19 +108,23 @@ class SingleLinkedList[T](val head: Option[SingleLinkedNode[T]], val tail: Optio
     }
   }
 
-//  def zip(other: SingleLinkedList[T]): SingleLinkedList[(T, T)] = {
-//    if (length != other.length) throw new IllegalArgumentException("Lengths must be equal to zip")
-//    else {
-//
-//    }
-//  }
+  def zip(other: SingleLinkedList[T]): SingleLinkedList[(T, T)] = {
+    if (length != other.length) throw new IllegalArgumentException("Lengths must be equal to zip")
+    else if (isEmpty) SingleLinkedList[(T, T)]()
+    else {
+      head.get.fold((SingleLinkedList[(T, T)](), other.head)) { case ((l, otherNode), node) =>
+        (l.add((node.value, otherNode.get.value)), otherNode.flatMap(_.next))
+      }._1.reverse
+    }
+  }
 
-//  def ==(other: SingleLinkedList[T]): Boolean = {
-//    if (length != other.length) false
-//    else {
-//
-//    }
-//  }
+  def ==(other: SingleLinkedList[T]): Boolean = {
+    if (length != other.length) false
+    else if (isEmpty) true
+    else {
+      this.zip(other).map { case (x, y) => x != y }.contains(true)
+    }
+  }
 
   def map[A](fn: (T) => A): SingleLinkedList[A] = {
     if (isEmpty) SingleLinkedList[A]()

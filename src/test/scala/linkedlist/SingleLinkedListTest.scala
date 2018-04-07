@@ -50,6 +50,7 @@ class SingleLinkedListTest extends WordSpec with Matchers {
     "properly zip two lists" in {
       empty.zip(empty).toString shouldEqual "()"
       aList.zip(aList).toString shouldEqual "((1,1))"
+      moreList.zip(moreList).toString shouldEqual "((5,5), (4,4), (3,3), (2,2), (1,1))"
       moreList.zip(moreList.reverse).toString shouldEqual "((5,1), (4,2), (3,3), (2,4), (1,5))"
     }
 

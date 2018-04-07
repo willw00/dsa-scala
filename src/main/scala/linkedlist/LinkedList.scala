@@ -118,11 +118,16 @@ class SingleLinkedList[T](val head: Option[SingleLinkedNode[T]], val tail: Optio
     }
   }
 
+  def exists(fn: (T) => Boolean) = {
+    if (head.isEmpty) false
+    else head.get.exists(fn)
+  }
+
   def ==(other: SingleLinkedList[T]): Boolean = {
     if (length != other.length) false
     else if (isEmpty) true
     else {
-      this.zip(other).map { case (x, y) => x != y }.contains(true)
+      !this.zip(other).exists { case (x, y) => x != y }
     }
   }
 

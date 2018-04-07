@@ -11,6 +11,27 @@ case class SingleLinkedNode[T](value: T, next: Option[SingleLinkedNode[T]]) {
     if (next.isEmpty) fn(init, this)
     else next.get.fold(fn(init, this))(fn)
   }
+
+  def map[A](fn: (T) => A): (Option[SingleLinkedNode[A]], Option[SingleLinkedNode[A]]) = {
+    if (next.isEmpty) (Some(SingleLinkedNode(fn(value), None)), Some(SingleLinkedNode(fn(value), None)))
+    else {
+      val (nextMappedNode, currentTail) = next.get.map(fn)
+      (Some(SingleLinkedNode(fn(value), nextMappedNode)), currentTail)
+    }
+  }
+
+  private def reverseLink(previous: Option[SingleLinkedNode[T]]): SingleLinkedNode[T] = {
+    val nextNode = Some(SingleLinkedNode(value, previous))
+    if (next.isEmpty) nextNode.get
+    else next.get.reverseLink(nextNode)
+  }
+
+  def reverse(): SingleLinkedNode[T] = {
+    if (next.isEmpty) this
+    else {
+      reverseLink(None)
+    }
+  }
 }
 
 trait LinkedList[T] {
@@ -27,7 +48,9 @@ trait LinkedList[T] {
 }
 
 object SingleLinkedList {
-  def apply[T](node: SingleLinkedNode[T]) = new SingleLinkedList(Some(node), Some(node))
+  def apply[T](): SingleLinkedList[T] = new SingleLinkedList[T](None, None)
+  def apply[T](node: SingleLinkedNode[T]): SingleLinkedList[T] = new SingleLinkedList(Some(node), Some(node))
+  def apply[T](value: T): SingleLinkedList[T] = apply(SingleLinkedNode(value, None))
 }
 
 class SingleLinkedList[T](val head: Option[SingleLinkedNode[T]], val tail: Option[SingleLinkedNode[T]]) extends LinkedList[T] {
@@ -37,8 +60,16 @@ class SingleLinkedList[T](val head: Option[SingleLinkedNode[T]], val tail: Optio
     new SingleLinkedList[T](newHead, newTail)
 
   def add(node: SingleLinkedNode[T]): SingleLinkedList[T] = {
-    copy(Some(node.copy(next = head)), head)
+    val newNode = Some(node.copy(next = head))
+    if (isEmpty) {
+      copy(newNode, newNode)
+    }
+    else {
+      copy(newNode, tail)
+    }
   }
+
+  def add(value: T): SingleLinkedList[T] = add(SingleLinkedNode(value, None))
 
   def isEmpty: Boolean = head.isEmpty
 
@@ -55,28 +86,47 @@ class SingleLinkedList[T](val head: Option[SingleLinkedNode[T]], val tail: Optio
 
   def reverse: SingleLinkedList[T] = {
     if (isEmpty || (head == tail)) this
-    else {
-      var current = head.get
-      var newList = new SingleLinkedList[T](None, None)
-      newList.add(current)
+    else new SingleLinkedList(Some(head.get.reverse()), head.map(_.copy(next = None)))
+  }
 
-      while (current.next.isDefined) {
-        newList.add(current.next.get)
-        current = current.next.get
-      }
-      newList
+  lazy val length: Int = {
+    if (isEmpty) 0
+    else {
+      head.get.fold[Int](0){ case (agg, _) => agg + 1}
     }
   }
 
   override def toString: String = {
     if (isEmpty) "()"
-    if (head == tail) s"(${head.get.value})"
+    else if (head == tail) s"(${head.get.value})"
     else {
       val strElems = head.get.fold("") { case (str, node) =>
-        if (node.next.isEmpty) node.value.toString
-        str ++ s"${node.value.toString}, "
+        if (node.next.isEmpty) str ++ node.value.toString
+        else str ++ s"${node.value.toString}, "
       }
-      s"(${strElems})"
+      s"($strElems)"
+    }
+  }
+
+//  def zip(other: SingleLinkedList[T]): SingleLinkedList[(T, T)] = {
+//    if (length != other.length) throw new IllegalArgumentException("Lengths must be equal to zip")
+//    else {
+//
+//    }
+//  }
+
+//  def ==(other: SingleLinkedList[T]): Boolean = {
+//    if (length != other.length) false
+//    else {
+//
+//    }
+//  }
+
+  def map[A](fn: (T) => A): SingleLinkedList[A] = {
+    if (isEmpty) SingleLinkedList[A]()
+    else {
+      val (newHead, newTail) = head.get.map(fn)
+      new SingleLinkedList[A](newHead, newTail)
     }
   }
 }

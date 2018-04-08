@@ -65,7 +65,7 @@ class SingleLinkedList[T](val head: Option[SingleLinkedNode[T]], val tail: Optio
 
   def contains(value: T): Boolean = {
     if (head.isEmpty) false
-    else head.exists(_.value == value)
+    else head.get.exists(v => v == value)
   }
 
   def remove: SingleLinkedList[T] = {

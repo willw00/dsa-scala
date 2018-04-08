@@ -9,7 +9,6 @@ object DoubleLinkedNode {
                previous: Option[DoubleLinkedNode[T]] = None): DoubleLinkedNode[T] = {
     val newNode = new DoubleLinkedNode[T](value)
     newNode.setNext(next).setPrev(previous)
-    newNode
   }
 }
 
@@ -39,23 +38,28 @@ class DoubleLinkedNode[T](val value: T) extends Node[T] {
   }
 
   def map[A](fn: (T) => A): (Option[DoubleLinkedNode[A]], Option[DoubleLinkedNode[A]]) = {
-    if (next.isEmpty) (Some(new DoubleLinkedNode(fn(value), None, None)), Some(new DoubleLinkedNode(fn(value), None, None)))
+    if (next.isEmpty) {
+      val newNode = new DoubleLinkedNode(fn(value))
+      (Some(newNode), Some(newNode))
+    }
     else {
       val (nextMappedNode, currentTail) = next.get.map(fn)
-      (Some(new DoubleLinkedNode(fn(value), nextMappedNode)), currentTail)
+      (Some(new DoubleLinkedNode(fn(value)).setNext(nextMappedNode)), currentTail)
     }
   }
 
-  private def reverseLink(previous: Option[DoubleLinkedNode[T]]): DoubleLinkedNode[T] = {
-    val nextNode = Some(DoubleLinkedNode(value, previous))
-    if (next.isEmpty) nextNode.get
-    else next.get.reverseLink(nextNode)
+  def reverseLink(prev: DoubleLinkedNode[T]): DoubleLinkedNode[T] = {
+    val newNext = previous
+    setPrev(Some(prev)).setNext(newNext)
+    if (next.isEmpty) this
+    else next.get.reverseLink(this)
   }
 
   def reverse(): DoubleLinkedNode[T] = {
-    if (next.isEmpty) this
+    if (previous.isEmpty) this
     else {
-      reverseLink(None)
+      val prev = previous.get.setPrev(Some(this))
+      setNext(Some(prev.reverse()))
     }
   }
 }
@@ -74,13 +78,13 @@ class DoubleLinkedList[T](val head: Option[DoubleLinkedNode[T]], val tail: Optio
     new DoubleLinkedList[T](newHead, newTail)
 
   def add(node: DoubleLinkedNode[T]): DoubleLinkedList[T] = {
-    val newNode = Some(node.copy(next = head))
+    node.setNext(head)
+    val newNode = Some(node)
     if (isEmpty) {
-      val newNode = Some(node)
       copy(newNode, newNode)
     }
     else {
-
+      head.get.setPrev(Some(node))
       copy(newNode, tail)
     }
   }
@@ -91,18 +95,23 @@ class DoubleLinkedList[T](val head: Option[DoubleLinkedNode[T]], val tail: Optio
 
   def contains(value: T): Boolean = {
     if (head.isEmpty) false
-    else head.exists(_.value == value)
+    else head.get.exists(v => v == value)
   }
 
   def remove: DoubleLinkedList[T] = {
     if (isEmpty) throw new ArrayStoreException("LinkedList is empty, nothing to remove")
     if (head == tail) new DoubleLinkedList(None, None)
-    copy(newHead = head.get.next, tail)
+    val next = head.get.next
+    next.get.setPrev(None)
+    copy(newHead = next, tail)
   }
 
   def reverse: DoubleLinkedList[T] = {
     if (isEmpty || (head == tail)) this
-    else new DoubleLinkedList(Some(head.get.reverse()), head.map(_.copy(next = None)))
+    else {
+      val newHead = tail.get.reverse()
+      new DoubleLinkedList(Some(newHead), head)
+    }
   }
 
   lazy val length: Int = {

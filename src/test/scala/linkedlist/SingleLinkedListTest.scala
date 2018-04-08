@@ -47,6 +47,14 @@ class SingleLinkedListTest extends WordSpec with Matchers {
       moreList.map( _ + 1).toString shouldEqual "(6, 5, 4, 3, 2)"
     }
 
+    "properly evaluate contains" in {
+      empty.contains(3) shouldEqual false
+      aList.contains(1) shouldEqual true
+      aList.contains(9) shouldEqual false
+      moreList.contains(4) shouldEqual true
+      moreList.contains(-1) shouldEqual false
+    }
+
     "properly zip two lists" in {
       empty.zip(empty).toString shouldEqual "()"
       aList.zip(aList).toString shouldEqual "((1,1))"

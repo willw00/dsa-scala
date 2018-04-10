@@ -48,19 +48,14 @@ class DoubleLinkedNode[T](val value: T) extends Node[T] {
     }
   }
 
-  def reverseLink(prev: DoubleLinkedNode[T]): DoubleLinkedNode[T] = {
+  def reverseLink(prev: Option[DoubleLinkedNode[T]]): Unit = {
     val newNext = previous
-    setPrev(Some(prev)).setNext(newNext)
-    if (next.isEmpty) this
-    else next.get.reverseLink(this)
+    val updatedThis = setPrev(prev).setNext(newNext)
+    newNext.foreach(_.reverseLink(Some(updatedThis)))
   }
 
-  def reverse(): DoubleLinkedNode[T] = {
-    if (previous.isEmpty) this
-    else {
-      val prev = previous.get.setPrev(Some(this))
-      setNext(Some(prev.reverse()))
-    }
+  def reverse(): Unit = {
+    if (previous.isDefined) reverseLink(next)
   }
 }
 
@@ -109,8 +104,8 @@ class DoubleLinkedList[T](val head: Option[DoubleLinkedNode[T]], val tail: Optio
   def reverse: DoubleLinkedList[T] = {
     if (isEmpty || (head == tail)) this
     else {
-      val newHead = tail.get.reverse()
-      new DoubleLinkedList(Some(newHead), head)
+      tail.get.reverse()
+      new DoubleLinkedList(tail, head)
     }
   }
 
@@ -138,6 +133,7 @@ class DoubleLinkedList[T](val head: Option[DoubleLinkedNode[T]], val tail: Optio
     else if (isEmpty) DoubleLinkedList[(T, T)]()
     else {
       head.get.fold((DoubleLinkedList[(T, T)](), other.head)) { case ((l, otherNode), node) =>
+        println(s"L: $l")
         (l.add((node.value, otherNode.get.value)), otherNode.flatMap(_.next))
       }._1.reverse
     }

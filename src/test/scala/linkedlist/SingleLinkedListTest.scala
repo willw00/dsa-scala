@@ -4,7 +4,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 
 class SingleLinkedListTest extends WordSpec with Matchers {
-  "A LinkedList" should {
+  "A SingleLinkedList" should {
     val empty = SingleLinkedList[Int]()
     val aList = empty.add(1)
     val moreList = aList.add(2).add(3).add(4).add(5)

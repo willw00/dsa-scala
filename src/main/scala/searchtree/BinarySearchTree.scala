@@ -2,25 +2,29 @@ package searchtree
 
 import common.Node
 
-case class TreeNode[T <: Comparable[T]](value: T, left: Option[TreeNode[T]], right: Option[TreeNode[T]]) extends Node[T] {
-  def insert(node: TreeNode[T]): TreeNode[T] = {
-    if (node.value.compareTo(value) < 0) {
-      left.map(l => l.insert(node)).getOrElse(TreeNode(value, Some(node), right))
+case class TreeNode(value: Int, left: Option[TreeNode], right: Option[TreeNode]) extends Node[Int] {
+  def insert(node: TreeNode): TreeNode = {
+    if (node.value < value) {
+      left.map(l => TreeNode(value, Some(l.insert(node)), right)).getOrElse(TreeNode(value, Some(node), right))
     }
     else {
-      right.map(r => r.insert(node)).getOrElse(TreeNode(value, left, Some(node)))
+      right.map(r => TreeNode(value, left, Some(r.insert(node)))).getOrElse(TreeNode(value, left, Some(node)))
     }
   }
 }
 
-class BinarySearchTree[T](root: Option[TreeNode[T]]) {
+object BinarySearchTree {
+  def empty = BinarySearchTree(None)
+}
 
-  def insert(node: TreeNode[T]): BinarySearchTree[T] = {
+case class BinarySearchTree(root: Option[TreeNode]) {
+
+  def insert(node: TreeNode): BinarySearchTree = {
     new BinarySearchTree(root.map { r =>
       r.insert(node)
     }.orElse(Some(node))
     )
   }
 
-  def insert(value: T) = insert(TreeNode(value, None, None))
+  def insert(value: Int): BinarySearchTree = insert(TreeNode(value, None, None))
 }

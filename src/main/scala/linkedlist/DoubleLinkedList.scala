@@ -133,7 +133,6 @@ class DoubleLinkedList[T](val head: Option[DoubleLinkedNode[T]], val tail: Optio
     else if (isEmpty) DoubleLinkedList[(T, T)]()
     else {
       head.get.fold((DoubleLinkedList[(T, T)](), other.head)) { case ((l, otherNode), node) =>
-        println(s"L: $l")
         (l.add((node.value, otherNode.get.value)), otherNode.flatMap(_.next))
       }._1.reverse
     }

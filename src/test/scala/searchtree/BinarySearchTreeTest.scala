@@ -27,5 +27,36 @@ class BinarySearchTreeTest extends WordSpec with Matchers {
       x.findParent(6).get.value shouldEqual 7
       x.findParent(8).get.value shouldEqual 7
     }
+
+    "properly count the number of elements" in {
+      t.count shouldEqual 0
+      t.insert(5).count shouldEqual 1
+      t.insert(5).insert(3).insert(7).insert(8).count shouldEqual 4
+    }
+
+    "properly compute equality" in {
+      val x = t.insert(5).insert(3).insert(1).insert(7).insert(6).insert(8)
+      val y = t.insert(5).insert(3).insert(1).insert(10).insert(19).insert(7)
+
+      t == t shouldEqual true
+      t == x shouldEqual false
+      x == x shouldEqual true
+      x == y shouldEqual false
+    }
+
+    "properly find the largest node" in {
+      val x = t.insert(5).insert(3).insert(1).insert(7).insert(6).insert(8)
+
+      t.findLargest shouldEqual None
+      x.findLargest.get shouldEqual 8
+    }
+
+    "properly delete a value" in {
+      val x = t.insert(5).insert(3).insert(1).insert(7).insert(6).insert(8)
+
+      t.delete(0) shouldEqual t
+      x.delete(1) shouldEqual t.insert(5).insert(3).insert(7).insert(6).insert(8)
+      x.delete(5) shouldEqual t.insert(3).insert(1).insert(7).insert(6).insert(8)
+    }
   }
 }

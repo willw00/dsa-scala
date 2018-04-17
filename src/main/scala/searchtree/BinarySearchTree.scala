@@ -12,6 +12,10 @@ case class TreeNode(value: Int, left: Option[TreeNode], right: Option[TreeNode])
     }
   }
 
+  def count: Int = {
+    1 + left.map(_.count).getOrElse(0) + right.map(_.count).getOrElse(0)
+  }
+
   def findNode(v: Int): Option[TreeNode] = {
     if (value == v) Some(this)
     else if (v < value) {
@@ -30,11 +34,21 @@ case class TreeNode(value: Int, left: Option[TreeNode], right: Option[TreeNode])
     }
   }
 
-  def delete(v: Int, parent: Option[TreeNode]): TreeNode = {
-    if (value == v) parent.map(_.copy(left = left, right = right)).getOrElse(throw new Exception("Your tree has no root"))
+  def delete(v: Int, parent: Option[TreeNode]): Option[TreeNode] = {
+    if (value == v) {
+      if (parent.isEmpty) {
+
+      }
+      parent.map(_.copy(left = left, right = right))
+    }
     else if (v < value) {
       left.flatMap(_.delete(v, Some(this)))
     }
+    else right.flatMap(_.delete(v, Some(this)))
+  }
+
+  def findLargest: TreeNode = {
+    right.map(_.findLargest).getOrElse(this)
   }
 }
 
@@ -50,6 +64,14 @@ case class BinarySearchTree(root: Option[TreeNode]) {
         r.insert(node)
       }.orElse(Some(node))
     )
+  }
+
+  def count: Int = {
+    root.map(_.count).getOrElse(0)
+  }
+
+  def findLargest: Option[Int] = {
+    root.map(_.findLargest.value)
   }
 
   def insert(value: Int): BinarySearchTree = insert(TreeNode(value, None, None))
@@ -72,9 +94,18 @@ case class BinarySearchTree(root: Option[TreeNode]) {
 
   def delete(value: Int): BinarySearchTree = {
     if (root.isEmpty) BinarySearchTree.empty
-    else if (root.get.value == value) BinarySearchTree.empty
+    else if (root.get.value == value) {
+      root.get.left.map { l =>
+        val largest = l.findLargest
+        val newLargest = largest.copy(left = l.delete(largest.value, None), right = root.get.right)
+        BinarySearchTree(Some(newLargest))
+      }.getOrElse(BinarySearchTree(root.get.right))
+    }
     else root.map { r =>
-      BinarySearchTree(Some(r.delete(r, None)))
+      val newRoot = r.delete(r.value, None)
+      BinarySearchTree(newRoot)
     }.getOrElse(this)
   }
+
+  def ==(other: BinarySearchTree) = this.toString == other.toString
 }

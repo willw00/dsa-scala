@@ -29,6 +29,13 @@ case class TreeNode(value: Int, left: Option[TreeNode], right: Option[TreeNode])
       right.flatMap(_.findParent(this, v))
     }
   }
+
+  def delete(v: Int, parent: Option[TreeNode]): TreeNode = {
+    if (value == v) parent.map(_.copy(left = left, right = right)).getOrElse(throw new Exception("Your tree has no root"))
+    else if (v < value) {
+      left.flatMap(_.delete(v, Some(this)))
+    }
+  }
 }
 
 object BinarySearchTree {
@@ -38,9 +45,10 @@ object BinarySearchTree {
 case class BinarySearchTree(root: Option[TreeNode]) {
 
   def insert(node: TreeNode): BinarySearchTree = {
-    new BinarySearchTree(root.map { r =>
-      r.insert(node)
-    }.orElse(Some(node))
+    new BinarySearchTree(
+      root.map { r =>
+        r.insert(node)
+      }.orElse(Some(node))
     )
   }
 
@@ -62,5 +70,11 @@ case class BinarySearchTree(root: Option[TreeNode]) {
     }
   }
 
-//  def delete()
+  def delete(value: Int): BinarySearchTree = {
+    if (root.isEmpty) BinarySearchTree.empty
+    else if (root.get.value == value) BinarySearchTree.empty
+    else root.map { r =>
+      BinarySearchTree(Some(r.delete(r, None)))
+    }.getOrElse(this)
+  }
 }

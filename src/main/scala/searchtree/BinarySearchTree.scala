@@ -42,47 +42,58 @@ case class TreeNode(value: Int, left: Option[TreeNode], right: Option[TreeNode])
     else right.map(_.replace(toReplace, replacement)).getOrElse(insert(replacement))
   }
 
-  def remove(toRemove: TreeNode, toRemoveParent: TreeNode): TreeNode = {
+  def delete(toRemove: TreeNode, toRemoveParent: TreeNode): TreeNode = {
+    println(s"To Remove: $toRemove.  Parent: $toRemoveParent")
     if (this == toRemoveParent) {
-      if (toRemoveParent.left.contains(toRemove) && toRemove.isLeaf) toRemoveParent.copy(left = None)
-      else if (toRemoveParent.right.contains(toRemove) && toRemove.isLeaf) toRemoveParent.copy(right = None)
+      println(s"On the parent")
+      if (toRemoveParent.left.contains(toRemove) && toRemove.isLeaf) {
+        println(s"ToRemove is leaf, is Left")
+        toRemoveParent.copy(left = None)
+      }
+      else if (toRemoveParent.right.contains(toRemove) && toRemove.isLeaf) {
+        println(s"ToRemove is leaf, is Right")
+        toRemoveParent.copy(right = None)
+      }
       else if (toRemoveParent.left.contains(toRemove) && toRemove.left.isEmpty && toRemove.right.isDefined) {
+        println(s"ToRemove is left, left empty")
         toRemoveParent.copy(left = toRemove.right)
       }
       else if (toRemoveParent.right.contains(toRemove) && toRemove.left.isEmpty && toRemove.right.isDefined) {
+        println(s"ToRemove is right, left empty")
         toRemoveParent.copy(right = toRemove.right)
       }
       else if (toRemoveParent.left.contains(toRemove) && toRemove.left.isDefined && toRemove.right.isEmpty) {
+        println(s"ToRemove is left, right empty")
         toRemoveParent.copy(left = toRemove.left)
       }
       else if (toRemoveParent.right.contains(toRemove) && toRemove.left.isDefined && toRemove.right.isEmpty) {
+        println(s"ToRemove is right, right empty")
         toRemoveParent.copy(right = toRemove.left)
       }
       else {
+        println(s"Else")
         val largest = toRemove.left.get.findLargest
+        println(s"Largest: $largest")
         val largestParent = findParent(toRemove.left.get, largest.value).get
-        val largestRemoved = largestParent.remove(largest, largestParent)
-        toRemoveParent.copy(
-          toRemoveParent.value,
-          Some(toRemove.copy(value = largest.value)),
-          toRemove.right.map(_.replace(largestParent, largestRemoved)))
+        println(s"Largest Parent: $largestParent")
+        val largestRemoved = largestParent.delete(largest, largestParent)
+        println(s"LargestRemoved: $largestRemoved")
+        val newRight = Some(largestRemoved.copy(value = largest.value))
+        println(s"NewRight: $newRight")
+        this.copy(
+          value,
+          left,
+          newRight)
       }
     }
-    else if (toRemoveParent.value < value) left.get.remove(toRemove, toRemoveParent)
-    else right.get.remove(toRemove, toRemoveParent)
-  }
-
-  def delete(v: Int, parent: Option[TreeNode]): Option[TreeNode] = {
-    if (value == v) {
-      if (parent.isEmpty) {
-
-      }
-      parent.map(_.copy(left = left, right = right))
+    else if (toRemoveParent.value < value) {
+      println(s"Parent is lower")
+      this.copy(left = left.map(_.delete(toRemove, toRemoveParent)))
     }
-    else if (v < value) {
-      left.flatMap(_.delete(v, Some(this)))
+    else {
+      println(s"Parent is larger")
+      this.copy(right = right.map(_.delete(toRemove, toRemoveParent)))
     }
-    else right.flatMap(_.delete(v, Some(this)))
   }
 
   def findLargest: TreeNode = {
@@ -130,32 +141,24 @@ case class BinarySearchTree(root: Option[TreeNode]) {
     }
   }
 
-  def remove(value: Int): BinarySearchTree = {
+  def delete(value: Int): BinarySearchTree = {
     if (root.isEmpty) BinarySearchTree.empty
     else {
       val r = root.get
       r.findNode(value).flatMap { nodeToRemove =>
         findParent(value).map { toRemoveParent =>
-          val newRoot = r.remove(nodeToRemove, toRemoveParent)
+          val newRoot = r.delete(nodeToRemove, toRemoveParent)
           BinarySearchTree(Some(newRoot))
+        }.orElse {
+          r.left.map { l =>
+            val largest = l.findLargest
+            val newRoot =
+              if (l != largest) largest.copy(left = Some(largest.copy(largest.value, r.left, r.right)))
+              else l.copy(right = r.right)
+            BinarySearchTree(Some(newRoot))
+          }
         }
       }.getOrElse(BinarySearchTree.empty)
-    }
-  }
-
-  def delete(value: Int): BinarySearchTree = {
-    if (root.isEmpty) BinarySearchTree.empty
-    else if (root.get.value == value) {
-      root.get.left.map { l =>
-        val largest = l.findLargest
-        val newLargest = largest.copy(left = l.delete(largest.value, None), right = root.get.right)
-        BinarySearchTree(Some(newLargest))
-      }.getOrElse(BinarySearchTree(root.get.right))
-    }
-    else {
-      val r = root.get
-      val newRoot = r.delete(r.value, None)
-      BinarySearchTree(newRoot)
     }
   }
 

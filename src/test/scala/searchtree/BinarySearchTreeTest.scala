@@ -58,6 +58,10 @@ class BinarySearchTreeTest extends WordSpec with Matchers {
       t.delete(0) shouldEqual t
       x.delete(5) shouldEqual t
       y.delete(1) shouldEqual t.insert(5).insert(3).insert(7).insert(6).insert(8)
+      y.delete(3) shouldEqual t.insert(5).insert(1).insert(7).insert(6).insert(8)
+      y.delete(7) shouldEqual t.insert(5).insert(3).insert(1).insert(6).insert(8)
+      y.delete(6) shouldEqual t.insert(5).insert(3).insert(1).insert(7).insert(8)
+      y.delete(8) shouldEqual t.insert(5).insert(3).insert(1).insert(7).insert(6)
       y.delete(5) shouldEqual t.insert(3).insert(1).insert(7).insert(6).insert(8)
     }
   }

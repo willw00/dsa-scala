@@ -51,6 +51,13 @@ class BinarySearchTreeTest extends WordSpec with Matchers {
       x.findLargest.get shouldEqual 8
     }
 
+    "properly find the smallest node" in {
+      val x = t.insert(5).insert(3).insert(1).insert(7).insert(6).insert(8)
+
+      t.findSmallest shouldEqual None
+      x.findSmallest.get shouldEqual 1
+    }
+
     "properly delete a value" in {
       val x = t.insert(5)
       val y = x.insert(3).insert(1).insert(7).insert(6).insert(8)

@@ -99,6 +99,10 @@ case class TreeNode(value: Int, left: Option[TreeNode], right: Option[TreeNode])
   def findLargest: TreeNode = {
     right.map(_.findLargest).getOrElse(this)
   }
+
+  def findSmallest: TreeNode = {
+    left.map(_.findSmallest).getOrElse(this)
+  }
 }
 
 object BinarySearchTree {
@@ -121,6 +125,10 @@ case class BinarySearchTree(root: Option[TreeNode]) {
 
   def findLargest: Option[Int] = {
     root.map(_.findLargest.value)
+  }
+
+  def findSmallest: Option[Int] = {
+    root.map(_.findSmallest.value)
   }
 
   def insert(value: Int): BinarySearchTree = insert(TreeNode(value, None, None))

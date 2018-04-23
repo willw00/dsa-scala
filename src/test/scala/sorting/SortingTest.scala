@@ -43,12 +43,27 @@ class SortingTest extends WordSpec with Matchers {
       val emptyArray = Array.empty[Int]
       val singleElement = Array(10)
       val a = Array.fill(10)(Random.nextInt)
-//      val a = Array(1, 6, 2, 8, 4)
       val aCopy = a.clone()
 
       val emptySorted = emptyArray.mergeSort
       val singleSorted = singleElement.mergeSort
       val aSorted = a.mergeSort
+
+
+      arraysEqual(emptySorted, Array.empty[Int]) shouldEqual true
+      arraysEqual(singleSorted, Array(10)) shouldEqual true
+      arraysEqual(aSorted, aCopy.sorted) shouldEqual true
+    }
+
+    "Be properly sortable using Quick Sort" in {
+      val emptyArray = Array.empty[Int]
+      val singleElement = Array(10)
+      val a = Array.fill(10)(Random.nextInt)
+      val aCopy = a.clone()
+
+      val emptySorted = emptyArray.quickSort
+      val singleSorted = singleElement.quickSort
+      val aSorted = a.quickSort
 
 
       arraysEqual(emptySorted, Array.empty[Int]) shouldEqual true

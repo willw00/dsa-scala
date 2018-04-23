@@ -1,3 +1,6 @@
+import scala.collection.mutable.ArrayBuffer
+import util.Random
+
 package object sorting {
   implicit class BubbleSorter(a: Array[Int]) {
     def bubbleSort: Int = {
@@ -67,6 +70,25 @@ package object sorting {
         val merged = left.merge(right.mergeSort)
         merged
       }
+    }
+  }
+
+  implicit class QuickSorter(a: Array[Int]) {
+    def quickSort: Array[Int] = {
+      if (a.length <= 1) return a
+
+      val pivot = Random.nextInt(a.length)
+      val pivotVal = a(pivot)
+      val lessThan = ArrayBuffer[Int]()
+      val equalTo = ArrayBuffer[Int]()
+      val greaterThan = ArrayBuffer[Int]()
+      a.foreach { e =>
+        if (e < pivotVal) lessThan += e
+        else if (e == pivotVal) equalTo += e
+        else greaterThan += e
+      }
+
+      lessThan.toArray.quickSort ++ equalTo ++ greaterThan.toArray.quickSort
     }
   }
 }

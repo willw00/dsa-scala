@@ -27,5 +27,33 @@ class SortingTest extends WordSpec with Matchers {
       arraysEqual(singleElement, Array(10)) shouldEqual true
       arraysEqual(a, aCopy.sorted) shouldEqual true
     }
+
+    "correctly merge with another array" in {
+      val emptyArray = Array.empty[Int]
+      val singleElement = Array(10)
+      val others = Array(1, 2, 3, 11)
+      val others2 = Array(-1, 2, 5, 12)
+
+      arraysEqual(singleElement.merge(emptyArray), Array(10)) shouldEqual true
+      arraysEqual(singleElement.merge(others), Array(1, 2, 3, 10, 11)) shouldEqual true
+      arraysEqual(others.merge(others2), Array(-1, 1, 2, 2, 3, 5, 11, 12)) shouldEqual true
+    }
+
+    "be properly sortable using Merge Sort" in {
+      val emptyArray = Array.empty[Int]
+      val singleElement = Array(10)
+      val a = Array.fill(10)(Random.nextInt)
+//      val a = Array(1, 6, 2, 8, 4)
+      val aCopy = a.clone()
+
+      val emptySorted = emptyArray.mergeSort
+      val singleSorted = singleElement.mergeSort
+      val aSorted = a.mergeSort
+
+
+      arraysEqual(emptySorted, Array.empty[Int]) shouldEqual true
+      arraysEqual(singleSorted, Array(10)) shouldEqual true
+      arraysEqual(aSorted, aCopy.sorted) shouldEqual true
+    }
   }
 }

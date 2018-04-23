@@ -19,4 +19,54 @@ package object sorting {
       comparisons
     }
   }
+
+  implicit class MergeSorter(a: Array[Int]) {
+    def merge(x: Array[Int]): Array[Int] = {
+      val z = Array.fill(a.length + x.length)(0)
+      var xCounter = 0
+      var aCounter = 0
+      var zCounter = 0
+
+      while (xCounter < x.length && aCounter < a.length) {
+        if (x(xCounter) < a(aCounter)) {
+          z(zCounter) = x(xCounter)
+          xCounter += 1
+        }
+        else {
+          z(zCounter) = a(aCounter)
+          aCounter += 1
+        }
+        zCounter += 1
+      }
+
+      while (xCounter < x.length) {
+        z(zCounter) = x(xCounter)
+        xCounter += 1
+        zCounter += 1
+      }
+
+      while (aCounter < a.length) {
+        z(zCounter) = a(aCounter)
+        aCounter += 1
+        zCounter += 1
+      }
+
+      z
+    }
+
+
+    def mergeSort: Array[Int] = {
+      val length = a.length
+
+      if (length <= 1) a
+      else {
+        val m = length / 2
+        val left = a.slice(0, m).mergeSort
+        val right = a.slice(m, length).mergeSort
+
+        val merged = left.merge(right.mergeSort)
+        merged
+      }
+    }
+  }
 }
